@@ -6,8 +6,7 @@ This script demonstrates how to use the eigenmode viewer:
 include("eigenmode_viewer.jl")
 ````
 
-To launch the interactive eigenmode viewer, use this command: `interact_eigenmodes(swt, qs, formula)`
-(same arguments as `intensities_interpolated(::SpinWaveTheory, ...)`).
+To launch the interactive eigenmode viewer, use this command: `interact_eigenmodes(swt, qpath)`
 
 The same script also provides a function `get_eigenmodes`, which gives programmatic access to the
 LSWT eigenmodes.
@@ -20,7 +19,7 @@ function example_afm()
   latvecs = lattice_vectors(a, b, c, 90, 90, 90)
   crystal = Crystal(latvecs,[[0.,0,0]],1)
   latsize = (2,1,1)
-  sys = System(crystal, latsize, [SpinInfo(1; S=1, g=2)], :SUN; seed=5)
+  sys = System(crystal, [1 => Moment(;s=1, g=2)], :SUN; seed=5,dims = latsize)
   set_exchange!(sys, 0.85,  Bond(1, 1, [1,0,0]))   # J1
   set_onsite_coupling!(sys, S -> 0.3 * S[3]^2,1)
 
@@ -29,13 +28,12 @@ function example_afm()
   randomize_spins!(sys)
   minimize_energy!(sys)
 
-  swt = SpinWaveTheory(sys)
-  qs = [[k,k,0] for k = range(0,1,length=2000)]
-  formula = intensity_formula(swt,:perp, kernel = Sunny.delta_function_kernel)
-  swt, qs, formula
+  swt = SpinWaveTheory(sys;measure = ssf_perp(sys))
+  qpath = q_space_path(crystal,[[0,0,0], [1,1,0]], 800)
+  swt, qpath
 end
 
-example_afm_swt, qs, formula = example_afm()
+example_afm_swt, qpath = example_afm()
 
 display(example_afm_swt.sys)
 ````
@@ -44,114 +42,96 @@ Now, we can run the LSWT eigenanalysis at a particular wavevector, which gives u
 several pieces of data:
 
 ````julia
-particular_wavevector = qs[35]
-result = get_eigenmodes(example_afm_swt, particular_wavevector, verbose = true)
-H, V, bases, eigenmode_displacements, energies = result
-````
-
-````
-V matrix:
-Diagonalized V'HV:
-Bases
-Eigenmodes (columns are atoms)
-
-Mode #1 with energy 3.4131344384359776
-
-Mode #2 with energy 3.3868146653340614
-
-Mode #3 with energy 1.067454062634183
-
-Mode #4 with energy 0.18918406881074443
-Eigenenergies
-Nm = 2, N = 3, Nf = 2, nmodes = 4
-
-````
-
-The LSWT Hamiltonian at $q$:
-
-````julia
-@show size(H);
-````
-
-````
-size(H) = (8, 8)
-
+particular_wavevector = qpath.qs[35]
+energies,T = excitations(example_afm_swt, particular_wavevector)
+Z_cos, Z_sin = get_eigenmodes(example_afm_swt, particular_wavevector)
 ````
 
 The bogoliubov matrix diagonalizing $H$:
 
 ````julia
-@show size(V);
+@show size(T);
 ````
 
 ````
-size(V) = (8, 8)
+size(T) = (8, 8)
 
 ````
 
-The local quantization basis at each site:
+The eigenenergies:
 
 ````julia
-@show size(bases);
+@show size(energies);
 ````
 
 ````
-size(bases) = (3, 3, 2)
+size(energies) = (8,)
 
 ````
 
-The eignmodes themselves:
+The corresponding modeshapes. Because the coherent states are inherently
+complex-valued, and the spin wave can also be elliptically polarized on top
+of that, we report separately the in-phase and quadrature "cos" and "sin"
+components of the spin wave polarization:
 
 ````julia
-@show size(eigenmode_displacements);
+@show size(Z_cos);
+@show size(Z_sin);
 ````
 
 ````
-size(eigenmode_displacements) = (3, 2, 8)
+size(Z_cos) = (16,)
+size(Z_sin) = (16,)
 
 ````
 
-The array of `eigenmode_displacements` has size N × [number of atoms] × [number of bands] and
-contains the perturbation of the SU(N) coherent state of the ground state associated with
-each band in the band structure, for each atom in the unit cell.
-We can plot the ground state together with the displacement for a particular band as follows:
+Each element of `Z_cos` and `Z_sin` is a list of modeshapes, where each modeshape
+is an N × [number of sublattices] matrix containing the perturbation of the
+ground state SU(N) coherent state associated with each sublattice.
+There is one such in-phase modeshape, and one such quadrature modeshape for each
+band (eigenmode) in the band structure. We can plot a vizualization of the
+dipole sector of the displacement for a particular eigenmode as follows:
 
 ````julia
 band = 3
-plot_eigenmode(Observable(eigenmode_displacements[:,:,band]),example_afm_swt)
+modeshapes = (Z_cos[band],Z_sin[band])
+k = Observable([0,0,0])
+plot_eigenmode(Observable(modeshapes),example_afm_swt;k)
 ````
-![](eigenmode_viewer_examples-17.png)
+![](eigenmode_viewer_examples-15.png)
 
-However, since the eignmodes are generally circular precessions of the spins,
-it's generally a good idea to look at a few different times:
+By default, this is a static view, so each spin is only displaying one particular
+phase of its full cycle. To get the full picture, we need to look at a few times:
 
 ````julia
 f = Figure(); ax = LScene(f[1,1],show_axis = false);
 for t = [0,π/2,π,3π/2]
-  plot_eigenmode!(ax,Observable(eigenmode_displacements[:,:,band]),example_afm_swt; t = Observable(t))
+  plot_eigenmode!(ax,Observable(modeshapes),example_afm_swt; t = Observable(t),k)
 end
 f
 ````
-![](eigenmode_viewer_examples-19.png)
+![](eigenmode_viewer_examples-17.png)
 
-Better yet, **the full eigenmode viewer can be started with this command**: `interact_eigenmodes(swt, qs, formula)`.
+The plot can be updated dynamically in the usual [GLMakie](https://docs.makie.org/stable/) way by updating the `Observable` values passed to `plot_eigenmode`, e.g. `t[] = 0.1; notify(t)`.
+
+Better yet, **the full eigenmode viewer can be started with this command**: `interact_eigenmodes(swt, qs)`.
 Below are two more example systems that can be used to try out `interact_eigenmodes`:
 
 ````julia
 function example_eigenmodes()
-  sys = System(Sunny.cubic_crystal(), (1,2,1), [SpinInfo(1;S=1/2,g=1)], :SUN, units = Units.theory)
-  set_external_field!(sys,[0,0,0.5]) # Field along Z
+  cryst = Sunny.cubic_crystal()
+  sys = System(cryst, [1 => Moment(;s=1/2,g=1)], :SUN;dims = (1,2,1))
+  set_field!(sys,[0,0,0.5]) # Field along Z
   set_exchange!(sys,-1.,Bond(1,1,[0,1,0])) # Strong Ferromagnetic J
   randomize_spins!(sys)
   minimize_energy!(sys)
   minimize_energy!(sys)
   minimize_energy!(sys)
 
-  swt = SpinWaveTheory(sys)
-  qs = [[0,k,0] for k = range(0,1,length=20)]
-  get_eigenmodes(swt,qs[3]; verbose = true)
-  formula = intensity_formula(swt,:perp, kernel = delta_function_kernel)
-  interact_eigenmodes(swt, qs, formula)
+  swt = SpinWaveTheory(sys;measure = ssf_perp(sys))
+  qpath = q_space_path(cryst,[[0,0,0], [0,1,0]], 40)
+  get_eigenmodes(swt,qpath.qs[3])
+  interact_eigenmodes(swt, qpath)
 end
 
 
@@ -165,7 +145,7 @@ function example_fei2()
   types = ["Fe", "I", "I"]
   FeI2 = Crystal(latvecs, positions; types)
   cryst = subcrystal(FeI2, "Fe")
-  sys = System(cryst, (4,4,4), [SpinInfo(1, S=1, g=2)], :SUN, seed=2)
+  sys = System(cryst, [1 => Moment(;s=1, g=2)], :SUN, seed=2;dims=(4,4,4))
   J1pm   = -0.236
   J1pmpm = -0.161
   J1zpm  = -0.261
@@ -216,13 +196,11 @@ function example_fei2()
   randomize_spins!(sys_min)
   minimize_energy!(sys_min)
 
-  swt = SpinWaveTheory(sys_min)
+  swt = SpinWaveTheory(sys_min;measure = ssf_perp(sys_min))
 
   q_points = [[0,0,0], [1,0,0], [0,1,0], [1/2,0,0], [0,1,0], [0,0,0]];
-  density = 50
-  path, xticks = reciprocal_space_path(cryst, q_points, density);
-  formula = intensity_formula(swt,:perp, kernel = delta_function_kernel)
-  interact_eigenmodes(swt, path, formula)
+  qpath = q_space_path(cryst, q_points, 800);
+  interact_eigenmodes(swt, qpath)
 end
 ````
 

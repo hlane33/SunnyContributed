@@ -7,39 +7,35 @@ function plot_band_intensities(dispersion, intensity;kwargs...)
     f
 end
 
-function plot_band_intensities!(ax, dispersion, intensity;kwargs...)
+function plot_band_intensities!(ax, dispersion, intensity;rev_x = false,kwargs...)
     Makie.ylims!(ax, min(0.0,minimum(dispersion)), maximum(dispersion))
     Makie.xlims!(ax, 1, size(dispersion, 1))
     colorrange = extrema(intensity)
     for i in axes(dispersion)[2]
-        Makie.lines!(ax, 1:length(dispersion[:,i]), dispersion[:,i]; color=intensity[:,i], colorrange,kwargs...)
+      Makie.lines!(ax, rev_x ? reverse(1:length(dispersion[:,i])) : 1:length(dispersion[:,i]), dispersion[:,i]; color=intensity[:,i], colorrange,kwargs...)
     end
     nothing
 end
 
-function plot_spin_data(sys::System; resolution=(768, 512), show_axis=false, kwargs...)
-    fig = Makie.Figure(; resolution)
-    ax = Makie.LScene(fig[1, 1]; show_axis)
-    plot_spin_data!(ax, sys; kwargs...)
-    return fig
+function plot_spin_data(sys::System; show_axis=false, kwargs...)
+  fig = Figure()
+  ax = LScene(fig[1, 1]; show_axis)
+  plot_spin_data!(ax, sys; kwargs...)
+  fig
 end
 
-function plot_spin_data!(ax, sys::System; arrowscale=1.0, stemcolor=:lightgray, color=:red, show_cell=true,
-                     orthographic=false, ghost_radius=0, rescale=1.0, dims=3, spin_data = Makie.Observable(sys.dipoles))
-    if dims == 2
-        sys.latsize[3] == 1 || error("System not two-dimensional in (a₁, a₂)")
-    elseif dims == 1
-        sys.latsize[[2,3]] == [1,1] || error("System not one-dimensional in (a₁)")
+function plot_spin_data!(ax, sys::System; spin_data = Makie.Observable(sys.dipoles))
+    supervecs = sys.crystal.latvecs * diagm(collect(sys.dims))
+    for i = 1:3
+      lines!(ax,[Point3f(0,0,0),Point3f((sys.crystal.latvecs[:,i] * sys.dims[i])...)],color = [:red,:green,:blue][i])
     end
-
-    supervecs = sys.crystal.latvecs * diagm(Vec3(sys.latsize))
 
     ### Plot spins ###
 
     # Show bounding box of magnetic supercell in gray (this needs to come first
     # to set a scale for the scene in case there is only one atom).
-    supervecs = sys.crystal.latvecs * diagm(Vec3(sys.latsize))
-    Makie.linesegments!(ax, Sunny.Plotting.cell_wireframe(supervecs, dims); color=:gray, linewidth=rescale*1.5)
+    supervecs = sys.crystal.latvecs * diagm(Vec3(sys.dims))
+    #Makie.linesegments!(ax, Sunny.Plotting.cell_wireframe(supervecs, dims); color=:gray, linewidth=rescale*1.5)
 
     # Bounding box of original crystal unit cell in teal
     if show_cell
