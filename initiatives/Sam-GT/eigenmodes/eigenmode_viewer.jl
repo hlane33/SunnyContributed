@@ -59,7 +59,6 @@ function get_eigenmodes(swt,q; verbose = false)
     modeshapes = Array{ComplexF64,3}[]
     for i = 1:num_eigenmodes
       push!(modeshapes,reshape(T[:,i],Nf,Nm,num_dagger_vs_non_dagger))
-      #push!(modeshapes_neg,reshape(T_neg[:,i],Nf,Nm,num_dagger_vs_non_dagger))
     end
 
 
@@ -236,14 +235,71 @@ function get_eigenmodes(swt,q; verbose = false)
     Z_cos_disp = Matrix{ComplexF64}[]
     Z_sin_disp = Matrix{ComplexF64}[]
     for mode = 1:num_eigenmodes
-      for site = 1:Nm
-        # Z = q + ip, and then embed in ambient space
-        push!(Z_cos_disp, Rs[site] * (q_cos_disp[mode] .+ im * p_cos_disp[mode]))
-        push!(Z_sin_disp, Rs[site] * (q_sin_disp[mode] .+ im * p_sin_disp[mode]))
+      # Z = q + ip within the tangent space...
+      δz_tangent = q_cos_disp[mode] .+ im * p_cos_disp[mode]
+      # and then embed in ambient space:
+      dim_ambient = Nf + 1
+      δz_ambient = [sum([Rs[site][i,k] * δz_tangent[k,site] for k = 1:Nf])
+                    for i = 1:dim_ambient, site = 1:Nm]
+      push!(Z_cos_disp, δz_ambient)
+
+      δz_tangent = q_sin_disp[mode] .+ im * p_sin_disp[mode]
+      δz_ambient = [sum([Rs[site][i,k] * δz_tangent[k,site] for k = 1:Nf])
+                    for i = 1:dim_ambient, site = 1:Nm]
+      push!(Z_sin_disp, δz_ambient)
+    end
+    return energies, Z_cos_disp, Z_sin_disp
+end
+
+function graph_eigenmode(ω,I,Q,k,swt::SpinWaveTheory;temporal = true,amp = 0.1)
+  color_cycle = [:blue,:orange,:green,:pink]
+
+  Na = Sunny.natoms(swt.sys.crystal)
+  Nsun = swt.sys.Ns[1]
+
+  fig = Figure()
+  ax_base = Axis(fig[1,1];title = "0",xlabel = "Time")
+  ax_a = Axis(fig[1,2];title = "0+a",xlabel = "Time")
+  ax_b = Axis(fig[2,1];title = "0+b",xlabel = "Time")
+  ax_c = Axis(fig[2,2];title = "0+c",xlabel = "Time")
+
+  for a = [ax_base,ax_a,ax_b,ax_c]
+    if temporal
+      a.xlabel[] = "Time"
+    else
+      a.xlabel[] = "Re Z"
+      a.ylabel[] = "Im Z"
+    end
+  end
+
+  overlap = 0.1
+  period = 2π/ω
+  ts = range(-overlap*period,(1+overlap)*period,length = 350)
+
+  for j = 1:Na, i = 1:Nsun
+    gs = swt.sys.coherents[1,1,1,j][i]
+
+    for (v,ax) = [([0,0,0],ax_base),([1,0,0],ax_a),([0,1,0],ax_b),([0,0,1],ax_c)]
+      spatial_phase = -2π * (Sunny.position(swt.sys,(v[1],v[2],v[3],j)) ⋅ k)
+      phase = spatial_phase .+ ω * ts
+      Zt = gs .+ amp * (cos.(phase) .* I[i,j] + sin.(phase) .* Q[i,j])
+      if temporal
+        lines!(ax,ts,real(Zt),color = color_cycle[i],linestyle = :solid)
+        lines!(ax,ts,imag(Zt),color = color_cycle[i],linestyle = :dash)
+        if Na > 1
+          text!(ax,ts[1] * 1.05,real(Zt)[1],color = color_cycle[i],text = "$j",align = (:right,:center))
+          text!(ax,ts[1] * 1.05,imag(Zt)[1],color = color_cycle[i],text = "$j",align = (:right,:center))
+        end
+      else
+        scatter!(ax,real(Zt[1]),imag(Zt[1]),color = color_cycle[i])
+        lines!(ax,real(Zt),imag(Zt),color = color_cycle[i],linestyle = :solid)
+        if Na > 1
+          text!(ax,real(Zt[1]),imag(Zt[1]),color = color_cycle[i],text = "$j",align = (:center,:top))
+        end
       end
     end
-    # [q_cos_disp q_sin_disp; p_cos_disp p_sin_disp]
-    return Z_cos_disp, Z_sin_disp
+  end
+  display(fig)
 end
 
 function plot_eigenmode(displacements, swt::SpinWaveTheory; kwargs...)
@@ -329,7 +385,7 @@ function interact_eigenmodes(swt::SpinWaveTheory, qs_spec::Sunny.QPath;time_scal
   k = Observable([0. + 0im,0,0]) # SWT Wavevector
 
   dim_global = swt.sys.mode == :dipole ? 3 : sys.Ns[1]
-  zc, zs = get_eigenmodes(swt,[0,0,0])
+  ωs, zc, zs = get_eigenmodes(swt,[0,0,0])
   rendered_displacements = Observable((zc[1],zs[1]))
   plot_eigenmode!(ax_mode, rendered_displacements, swt; t, k)
 
@@ -355,8 +411,7 @@ function interact_eigenmodes(swt::SpinWaveTheory, qs_spec::Sunny.QPath;time_scal
       q_interp = (1-τ) .* qs[q_int] .+ τ .* qs[q_int+1]
 
       # Perform the eigenmode analysis
-      energies, T = excitations(swt,q_interp)
-      zc,zs = get_eigenmodes(swt,q_interp)
+      energies,zc,zs = get_eigenmodes(swt,q_interp)
 
       k[] .= q_interp
       notify(k)
