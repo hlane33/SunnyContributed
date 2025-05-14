@@ -43,8 +43,8 @@ several pieces of data:
 
 ````julia
 particular_wavevector = qpath.qs[35]
-energies,T = excitations(example_afm_swt, particular_wavevector)
-Z_cos, Z_sin = get_eigenmodes(example_afm_swt, particular_wavevector)
+energies, T = excitations(example_afm_swt, particular_wavevector)
+energies, Z_cos, Z_sin = get_eigenmodes(example_afm_swt, particular_wavevector)
 ````
 
 The bogoliubov matrix diagonalizing $H$:
