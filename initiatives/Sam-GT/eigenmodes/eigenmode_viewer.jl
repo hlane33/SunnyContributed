@@ -251,17 +251,17 @@ function get_eigenmodes(swt,q; verbose = false)
     return energies, Z_cos_disp, Z_sin_disp
 end
 
-function graph_eigenmode(ω,I,Q,k,swt::SpinWaveTheory;temporal = true,amp = 0.1)
+function graph_eigenmode(ω,I,Q,k,swt::SpinWaveTheory;temporal = true,amp = 0.3)
   color_cycle = [:blue,:orange,:green,:pink]
 
   Na = Sunny.natoms(swt.sys.crystal)
   Nsun = swt.sys.Ns[1]
 
   fig = Figure()
-  ax_base = Axis(fig[1,1];title = "0",xlabel = "Time")
-  ax_a = Axis(fig[1,2];title = "0+a",xlabel = "Time")
-  ax_b = Axis(fig[2,1];title = "0+b",xlabel = "Time")
-  ax_c = Axis(fig[2,2];title = "0+c",xlabel = "Time")
+  ax_base = Axis(fig[1,1];title = "unit cell 0",xlabel = "Time")
+  ax_a = Axis(fig[1,2];title = "unit cell 0+a",xlabel = "Time")
+  ax_b = Axis(fig[2,1];title = "unit cell 0+b",xlabel = "Time")
+  ax_c = Axis(fig[2,2];title = "unit cell 0+c",xlabel = "Time")
 
   for a = [ax_base,ax_a,ax_b,ax_c]
     if temporal
@@ -291,7 +291,10 @@ function graph_eigenmode(ω,I,Q,k,swt::SpinWaveTheory;temporal = true,amp = 0.1)
           text!(ax,ts[1] * 1.05,imag(Zt)[1],color = color_cycle[i],text = "$j",align = (:right,:center))
         end
       else
-        scatter!(ax,real(Zt[1]),imag(Zt[1]),color = color_cycle[i])
+        Z0 = gs .+ amp * (cos.(0) .* I[i,j] + sin.(0) .* Q[i,j])
+        scatter!(ax,real(Z0),imag(Z0),color = color_cycle[i])
+        Z90 = gs .+ amp * (cos.(π/2) .* I[i,j] + sin.(π/2) .* Q[i,j])
+        scatter!(ax,real(Z90),imag(Z90),color = color_cycle[i],marker = 'x')
         lines!(ax,real(Zt),imag(Zt),color = color_cycle[i],linestyle = :solid)
         if Na > 1
           text!(ax,real(Zt[1]),imag(Zt[1]),color = color_cycle[i],text = "$j",align = (:center,:top))
@@ -309,7 +312,7 @@ function plot_eigenmode(displacements, swt::SpinWaveTheory; kwargs...)
     fig
 end
 
-function plot_eigenmode!(ax, displacements, swt::SpinWaveTheory; t = nothing, k, kwargs...)
+function plot_eigenmode!(ax, displacements, swt::SpinWaveTheory; amp = 1.0,t = nothing, k, kwargs...)
   super_size = (3,5,2)
   sys_large = resize_supercell(swt.sys,super_size)
   
@@ -329,17 +332,15 @@ function plot_eigenmode!(ax, displacements, swt::SpinWaveTheory; t = nothing, k,
   on(t;update = true) do time
     Z_cos, Z_sin = displacements[]
     for i = eachsite(sys_large)
-      #spatial_phase = -2π * ((collect(i.I[1:3]) .+ sys_large.crystal.positions[i.I[4]]) ⋅ k[])
       spatial_phase = -2π * (Sunny.position(sys_large,i) ⋅ k[])
       atom = i.I[4]
       phase = spatial_phase + time
       if sys_large.mode == :SUN
-        coherents_scratch[i] = sys_large.coherents[i] .+ cos(phase) * collect(Z_cos[:,atom]) .+ sin(phase) * collect(Z_sin[:,atom])
+        coherents_scratch[i] = sys_large.coherents[i] .+ amp * (cos(phase) * collect(Z_cos[:,atom]) .+ sin(phase) * collect(Z_sin[:,atom]))
         sys_large.dipoles[i] = Sunny.expected_spin(coherents_scratch[i])
       elseif sys_large.mode == :dipole
         error("NYI")
-        #dipole_scratch[i] = sys_large.dipoles[i] .+ cos(phase) * Z_cos[:,atom] .+ sin(phase) * Z_sin[:,atom]
-        sys_large.dipoles[i] = dipole_scratch[i]
+        #sys_large.dipoles[i] = dipole_scratch[i]
       end
     end
     notify(notif_sunny)
