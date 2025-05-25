@@ -1,5 +1,7 @@
 ## HFM 2025 Sunny Tutorial
 
+This page: https://tinyurl.com/mryhr869
+
 ![image](assets/qr.png)
 
 ### 1. [Install Julia and Sunny](https://github.com/SunnySuite/Sunny.jl/wiki/Getting-started-with-Julia) and [VSCode editor](https://www.julia-vscode.org/)
