@@ -1,6 +1,6 @@
 ## HFM 2025 Sunny Tutorial
 
-![image](qr.png)
+![image](assets/qr.png)
 
 ### 1. [Install Julia and Sunny](https://github.com/SunnySuite/Sunny.jl/wiki/Getting-started-with-Julia) and [VSCode editor](https://www.julia-vscode.org/)
 
@@ -20,4 +20,4 @@ Problem? Try `update` from the [Julia package manager](https://github.com/SunnyS
 
 <br>
 
-<img src="ornl-light.svg" alt="ORNL" height="38px"> <img src="lanl-light.svg" alt="LANL" height="38px"> <img src="sunny_logo.svg" alt="Sunny" height="38px">
+<img src="assets/ornl-light.svg" alt="ORNL" height="38px"> <img src="assets/lanl-light.svg" alt="LANL" height="38px"> <img src="assets/sunny_logo.svg" alt="Sunny" height="38px">
