@@ -14,7 +14,7 @@ view_crystal(cryst)
 
 Problem? Try `update` from the [Julia package manager](https://github.com/SunnySuite/Sunny.jl/wiki/Getting-started-with-Julia#the-built-in-julia-package-manager), then restart Julia.
 
-### 3. Download code files
+### 3. Download [code.zip](https://github.com/SunnySuite/SunnyContributed/raw/main/workshops/2025_05_HFM/code.zip)
 
 ### 4. [Join our community on Slack](https://join.slack.com/t/sunny-users/shared_invite/zt-1otxwwko6-LzPtp7Fazkjx2XEqfgKqtA)
 
