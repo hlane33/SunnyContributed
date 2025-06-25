@@ -2,7 +2,7 @@
 
 [The 13th International Conference on Highly Frustrated Magnetism](https://conference.physics.utoronto.ca/event/18/)
 
-## This Page: https://tinyurl.com/mryhr869
+## This Page: https://rb.gy/gajpv2
 
 ![image](assets/qr.png)
 
