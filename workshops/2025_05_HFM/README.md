@@ -1,10 +1,14 @@
+<!---
 ## HFM 2025 Sunny Tutorial
 
 [The 13th International Conference on Highly Frustrated Magnetism](https://conference.physics.utoronto.ca/event/18/)
+-->
 
 ## This Page: https://rb.gy/gajpv2
 
+<!---
 ![image](assets/qr.png)
+-->
 
 ### 1. [Install Julia and Sunny](https://github.com/SunnySuite/Sunny.jl/wiki/Getting-started-with-Julia) and [VSCode editor](https://www.julia-vscode.org/)
 
