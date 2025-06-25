@@ -16,7 +16,7 @@
 
 ```julia
 using GLMakie, Sunny
-cryst = Sunny.diamond_crystal())
+cryst = Sunny.diamond_crystal()
 view_crystal(cryst)
 ```
 
