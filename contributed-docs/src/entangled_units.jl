@@ -1,14 +1,15 @@
 # # Entangled Units Formalism
-# **AUTHOR** David Dahlbom (dahlbomda@ornl.gov), **DATE**: January 21, 2025
+# **AUTHOR** David Dahlbom (dahlbomda@ornl.gov), **DATE**: January 21, 2025, **UPDATED**: June 30, 2025
 
 # Traditional "large-_S_" classical methods start by modeling a spin system as a
-# set of two-level quantum systems (dipoles) on each site of a lattice. This is
-# the so-called product state assumption. In classical dynamics, these different
-# two-level systems interact with each other, but they are never entangled. The
-# classical dynamics evolves these product states into other product states,
-# meaning that one can always think about the state of a system as a set of
-# individual spins (dipoles or, equivalently, two-level quantum systems)
-# existing on each site of the lattice.
+# set of dipoles (equivalently, 2-level quantum systems) on each site of a
+# lattice. This is corresponds to the assumption that the global wave function
+# is a product of two-level states (more precisely, product of SU(2) coherent
+# states). In classical dynamics, these different two-level systems interact
+# with each other, but they are never entangled: the classical dynamics evolves
+# these product states into other product states, meaning that one can always
+# think about the state of a system as a set of individual dipoles existing on
+# each site of the lattice for all time.
 #
 # The SU(_N_) formalism extends this picture in a straightforward way. Instead
 # of having a two-level system on each site, one has an _N_-level system. The
@@ -17,7 +18,8 @@
 # other in the classical picture, but they are never entangled. The treatment of
 # each individual _N_-level system is quantum mechanical, however. Thus, if one
 # puts two-spins inside each one of these sites, the entanglement between the
-# two spins will be faithfully represented and evolved.
+# two spins will be faithfully represented and evolved in a "classical"
+# formalism.
 #
 # This tutorial gives a simple illustration of this idea using Sunny's entangled
 # unit formalism. The first model we will consider is the the strong-rung
