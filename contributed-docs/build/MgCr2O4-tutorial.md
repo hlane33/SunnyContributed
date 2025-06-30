@@ -30,6 +30,16 @@ using Sunny # The main package
 using GLMakie # Plotting package
 ````
 
+````
+Precompiling PlottingExt...
+   6506.6 ms  ✓ Sunny → PlottingExt
+  1 dependency successfully precompiled in 7 seconds. 335 already precompiled.
+Precompiling GLMakiePrecompilesExt...
+  35538.6 ms  ✓ Sunny → GLMakiePrecompilesExt
+  1 dependency successfully precompiled in 36 seconds. 356 already precompiled.
+
+````
+
 ## Setting up the crystal structure
 
 Before specifying the interactions of our system, we first must set up the

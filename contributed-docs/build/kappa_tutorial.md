@@ -212,7 +212,7 @@ total_spectral_weight(sc; kT) / prod(sys.dims)
 ````
 
 ````
-5.480822137387131
+5.480822137387488
 ````
 
 This is relatively close to 16/3. So, at low temperatures, application of
@@ -251,7 +251,7 @@ total_spectral_weight(sc; kT) / prod(sys.dims)
 ````
 
 ````
-2.9491843014932657
+2.9437760058631333
 ````
 
 While this is larger than the classical value of 4/3, it is still
@@ -299,7 +299,7 @@ total_spectral_weight(sc; kT) / prod(sys.dims)
 ````
 
 ````
-5.0315750139022875
+5.098867613777116
 ````
 
 The result is something slightly greater than 5, substantially closer to the
