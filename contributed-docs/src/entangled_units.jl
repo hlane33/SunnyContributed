@@ -157,8 +157,8 @@ res_0 = intensities(sc, qs_0; energies=:available, kT)
 res_π = intensities(sc, qs_π; energies=:available, kT)
 
 fig = Figure(size=(800, 400))
-plot_intensities!(fig[1,1], res_0; axis=(; title="Symmetric Channel"))
-plot_intensities!(fig[1,2], res_π; axis=(; title="Anti-symmetric Channel"))
+plot_intensities!(fig[1,1], res_0; title="Symmetric Channel")
+plot_intensities!(fig[1,2], res_π; title="Anti-symmetric Channel")
 fig
 
 # Note that the classical dynamics reproduces the same dispersion as spin wave
@@ -184,8 +184,8 @@ res_0 = intensities(sc, qs_0; energies=:available, kT)
 res_π = intensities(sc, qs_π; energies=:available, kT)
 
 fig = Figure(size=(800, 400))
-plot_intensities!(fig[1,1], res_0; axis=(; title="Symmetric Channel"))
-plot_intensities!(fig[1,2], res_π; axis=(; title="Anti-symmetric Channel"))
+plot_intensities!(fig[1,1], res_0; title="Symmetric Channel")
+plot_intensities!(fig[1,2], res_π; title="Anti-symmetric Channel")
 fig
 
 # A pseudogap persists even well above the ordering temperature, in agreement
