@@ -7,9 +7,9 @@ lattice. This is corresponds to the assumption that the global wave function
 is a product of two-level states (more precisely, product of SU(2) coherent
 states). In classical dynamics, these different two-level systems interact
 with each other, but they are never entangled: the classical dynamics evolves
-these product states into other product states, meaning that one can always
-think about the state of a system as a set of individual dipoles existing on
-each site of the lattice for all time.
+product states into other product states, meaning that one can always think
+about the state of a system as a set of individual dipoles existing on each
+site of the lattice for all time.
 
 The SU(_N_) formalism extends this picture in a straightforward way. Instead
 of having a two-level system on each site, one has an _N_-level system. The
@@ -226,7 +226,7 @@ A pseudogap persists even well above the ordering temperature, in agreement
 with exact solutions. This is in contrast with traditional Landau-Lifshitz
 dynamics, which remains gapless throughout all temperatures.
 
-For a more complete study of this model, see [D. Dahlbom et al., PRB 110 (2024)](https://arxiv.org/abs/0804.4437).
+For a more complete study of this model, see [D. Dahlbom et al., PRB 110 (2024)](https://arxiv.org/abs/2405.16315).
 
 ## Material Example: Ba₃Mn₂O₈
 
