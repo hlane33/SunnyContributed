@@ -88,7 +88,8 @@ qs  = [[Hs[i], Hs[i], 0] for i in 1:Lmag]
 com_indices = get_reshaped_cartesian_index(npt, qs)
 
 # Get the two-particle eigenstates from exact diagonalization
-num_2ps = length(npt′.two_particle_states[1,1,1])
+num_bands = Sunny.nbands(swt)
+num_2ps = Int(binomial(Lmag^2*num_bands+2-1, 2) / Lmag^2)
 E2ps = zeros(num_2ps, Lmag)
 
 pm = Progress(Lmag; desc="Calculating two-particle energies")
@@ -116,7 +117,7 @@ Szz_cf = zeros(Lmag, length(ωs));
 pm = Progress(Lmag; desc="Calculating intensities using continued fraction")
 n_iters = 13
 Threads.@threads for i in 1:Lmag
-    Szz_cf[i, :] = Sunny.dssf_continued_fraction_two_particle(npt′, qs[i], ωs, η, n_iters)
+    Szz_cf[i, :] = Sunny.dssf_continued_fraction(npt′, qs[i], ωs, η, n_iters; single_particle_correction=false)[:, 3]
     next!(pm)
 end
 
