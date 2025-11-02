@@ -79,9 +79,9 @@ positions = [[0.1250, 0.1250, 0.1250],
 types = ["Mg","Cr","O"]
 xtal_mgcro_1 = Crystal(latvecs, positions; types)
 
-# Sunny returned a valid crystal, but it did get right space group for MgCr2O4.
-# This can be fixed by modifying the input to include the space group and the
-# setting.
+# Sunny returned a valid crystal, but it did not get right space group for
+# MgCr2O4. This can be fixed by modifying the input to include the space group
+# and the setting.
 # 
 # ### "Experimentalist" Method #2 (Correct)
 
