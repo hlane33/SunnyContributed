@@ -16,6 +16,7 @@ else
 end
 
 # Copy over any supplemental material needed for build
+cp(joinpath(@__DIR__, "src", "Ba3Mn2O8.cif"), joinpath(@__DIR__, "build", "Ba3Mn2O8.cif"); force=true)
 cp(joinpath(@__DIR__, "src", "MgCr2O4_160953_2009.cif"), joinpath(@__DIR__, "build", "MgCr2O4_160953_2009.cif"); force=true)
 cp(joinpath(@__DIR__, "src", "kappa_supplementals.jl"), joinpath(@__DIR__, "build", "kappa_supplementals.jl"); force=true)
 

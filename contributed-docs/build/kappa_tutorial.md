@@ -194,7 +194,7 @@ total_spectral_weight(sc) / (prod(sys.dims))
 ````
 
 ````
-1.3333333333333335
+1.3333333333333341
 ````
 
 The result is 4/3, which is the expected "classical" sum rule. This reference can be
@@ -212,7 +212,7 @@ total_spectral_weight(sc; kT) / prod(sys.dims)
 ````
 
 ````
-5.480822137387488
+5.480822137387149
 ````
 
 This is relatively close to 16/3. So, at low temperatures, application of
@@ -251,7 +251,7 @@ total_spectral_weight(sc; kT) / prod(sys.dims)
 ````
 
 ````
-2.9437760058631333
+2.966494528272752
 ````
 
 While this is larger than the classical value of 4/3, it is still
@@ -299,7 +299,7 @@ total_spectral_weight(sc; kT) / prod(sys.dims)
 ````
 
 ````
-5.098867613777116
+4.978319471602372
 ````
 
 The result is something slightly greater than 5, substantially closer to the

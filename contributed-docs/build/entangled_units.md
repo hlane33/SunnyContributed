@@ -156,7 +156,7 @@ end;
 ````
 
 ````
-Consider dt ≈ 0.1307 for this spin configuration at tol = 0.01.
+Consider dt ≈ 0.1307 for this spin configuration at tol = 0.01000.
 
 ````
 
