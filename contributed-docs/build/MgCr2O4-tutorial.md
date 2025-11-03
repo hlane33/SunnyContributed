@@ -128,7 +128,7 @@ Type 'O', Wyckoff 3a (site sym. '3m'):
 
 ````
 
-Sunny returned a valid crystal, but it did not get right space group for
+Sunny returned a valid crystal, but it did not get the right space group for
 MgCr2O4. This can be fixed by modifying the input to include the space group
 and the setting.
 
